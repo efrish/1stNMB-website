@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Syv_hElePfN3NrI8yKmvI"
+uri = "file://artifacts/fnmb-website/public/images/hero.png"
+type = "image"
+title = "Suburban home at sunset"
+
+[[generated]]
+id = "JI0ktnm9nPZN0h4QMLCZ3"
+uri = "file://artifacts/fnmb-website/public/images/team.png"
+type = "image"
+title = "Diverse professional mortgage team"
+
+[[generated]]
+id = "Ma1RXQdQgeY5E0ongwiMf"
+uri = "file://artifacts/fnmb-website/public/images/blog-1.png"
+type = "image"
+title = "Keys and house miniature"
+
+[[generated]]
+id = "g5sKHax5ZDFs-B2vI_1T9"
+uri = "file://artifacts/fnmb-website/public/images/blog-2.png"
+type = "image"
+title = "Financial charts and coffee"
