@@ -38,8 +38,8 @@ export default function About() {
             >
               {[
                 { src: teamMember1, alt: "Edward Frish", name: "Edward Frish", title: "President / Broker / Owner" },
-                { src: teamMember2, alt: "Team Member", name: "", title: "" },
-                { src: teamMember3, alt: "Team Member", name: "", title: "" },
+                { src: teamMember2, alt: "Annabel R.", name: "Annabel R.", title: "Real Estate Agent · Educator · Marketing" },
+                { src: teamMember3, alt: "Gaudy R.", name: "Gaudy R.", title: "Transaction Coordinator · Office Manager" },
               ].map((member, i) => (
                 <motion.div
                   key={i}
