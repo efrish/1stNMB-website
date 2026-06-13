@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logoImg from "@assets/image_1781355777242.png";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,15 +44,12 @@ export function Navbar() {
       </div>
 
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative w-10 h-10 flex items-center justify-center bg-accent text-primary font-bold text-xl rounded-sm transform group-hover:rotate-12 transition-transform shadow-lg">
-            <div className="absolute inset-0 bg-primary transform rotate-45 -z-10 opacity-10"></div>
-            1
-          </div>
-          <div className={`font-serif font-bold text-xl leading-tight ${isScrolled ? 'text-primary' : 'text-white'}`}>
-            First Nationwide<br />
-            <span className="text-sm font-sans font-normal opacity-80">Mortgage Bank</span>
-          </div>
+        <Link href="/" className="flex items-center group">
+          <img
+            src={logoImg}
+            alt="First Nationwide Mortgage Bank"
+            className={`h-14 w-auto object-contain transition-all duration-300 group-hover:opacity-90 ${isScrolled ? 'rounded-md shadow-sm' : ''}`}
+          />
         </Link>
 
         {/* Desktop Nav */}

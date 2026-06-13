@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import logoImg from "@assets/image_1781355777242.png";
 
 export function Footer() {
   return (
@@ -8,14 +9,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="relative w-10 h-10 flex items-center justify-center bg-accent text-primary font-bold text-xl rounded-sm">
-                1
-              </div>
-              <div className="font-serif font-bold text-xl leading-tight">
-                First Nationwide<br />
-                <span className="text-sm font-sans font-normal opacity-80">Mortgage Bank</span>
-              </div>
+            <div className="mb-6">
+              <img
+                src={logoImg}
+                alt="First Nationwide Mortgage Bank"
+                className="h-20 w-auto object-contain"
+              />
             </div>
             <p className="text-primary-foreground/80 leading-relaxed text-sm">
               Your trusted partner in home ownership and real estate investment. Expert mortgage solutions tailored to your financial goals.
