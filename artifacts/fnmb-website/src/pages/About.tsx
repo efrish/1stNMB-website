@@ -37,9 +37,9 @@ export default function About() {
               className="grid grid-cols-3 gap-4"
             >
               {[
-                { src: teamMember1, alt: "Team Member" },
-                { src: teamMember2, alt: "Team Member" },
-                { src: teamMember3, alt: "Team Member" },
+                { src: teamMember1, alt: "Edward Frish", name: "Edward Frish", title: "President / Broker / Owner" },
+                { src: teamMember2, alt: "Team Member", name: "", title: "" },
+                { src: teamMember3, alt: "Team Member", name: "", title: "" },
               ].map((member, i) => (
                 <motion.div
                   key={i}
@@ -47,7 +47,7 @@ export default function About() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.15, duration: 0.5 }}
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center gap-2"
                 >
                   <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-white ring-2 ring-accent/30">
                     <img
@@ -56,6 +56,12 @@ export default function About() {
                       className="w-full h-full object-cover object-top"
                     />
                   </div>
+                  {member.name && (
+                    <div className="text-center">
+                      <p className="font-semibold text-primary text-sm leading-tight">{member.name}</p>
+                      <p className="text-accent text-xs font-medium mt-0.5 leading-tight">{member.title}</p>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </motion.div>
