@@ -75,11 +75,11 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-primary-foreground/80">
                 <MapPin className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                <span>123 Financial District Blvd, Suite 400<br/>New York, NY 10005</span>
+                <span>21900 Burbank Blvd., #205<br/>Woodland Hills, CA 91367</span>
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/80">
                 <Phone className="h-5 w-5 text-accent flex-shrink-0" />
-                <span>(888) 1ST-NMB1</span>
+                <span>(818) 371-1665</span>
               </li>
               <li className="flex items-center gap-3 text-primary-foreground/80">
                 <Mail className="h-5 w-5 text-accent flex-shrink-0" />
@@ -91,7 +91,7 @@ export function Footer() {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/60 text-sm text-center md:text-left">
-            &copy; {new Date().getFullYear()} First Nationwide Mortgage Bank. All rights reserved. NMLS #1234567. Equal Housing Lender.
+            &copy; {new Date().getFullYear()} First Nationwide Mortgage Bank. All rights reserved. Equal Housing Lender.
           </p>
           <div className="flex gap-4 text-sm text-primary-foreground/60">
             <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>

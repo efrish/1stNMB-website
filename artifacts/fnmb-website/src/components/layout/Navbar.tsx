@@ -34,7 +34,7 @@ export function Navbar() {
       <div className={`container mx-auto px-4 hidden md:flex justify-end items-center gap-6 text-sm mb-2 transition-all ${isScrolled ? 'text-muted-foreground' : 'text-primary-foreground/80'}`}>
         <div className="flex items-center gap-2">
           <Phone className="h-4 w-4" />
-          <span>(888) 1ST-NMB1</span>
+          <span>(818) 371-1665</span>
         </div>
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4" />
@@ -116,7 +116,7 @@ export function Navbar() {
           <div className="flex flex-col gap-2 mt-4 text-sm text-muted-foreground bg-muted p-4 rounded-lg">
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              <span>(888) 1ST-NMB1</span>
+              <span>(818) 371-1665</span>
             </div>
             <div className="flex items-center gap-2">
               <Mail className="h-4 w-4" />

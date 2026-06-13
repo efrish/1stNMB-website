@@ -80,8 +80,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <p className="font-bold text-primary">Call Us</p>
-                      <p className="text-muted-foreground">(888) 1ST-NMB1</p>
-                      <p className="text-sm text-muted-foreground mt-1">Mon-Fri: 8am - 6pm EST</p>
+                      <p className="text-muted-foreground">(818) 371-1665</p>
+                      <p className="text-sm text-muted-foreground mt-1">Mon-Fri: 8am - 6pm PST</p>
                     </div>
                   </div>
                   
@@ -102,7 +102,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <p className="font-bold text-primary">Headquarters</p>
-                      <p className="text-muted-foreground">123 Financial District Blvd<br/>Suite 400<br/>New York, NY 10005</p>
+                      <p className="text-muted-foreground">21900 Burbank Blvd., #205<br/>Woodland Hills, CA 91367</p>
                     </div>
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export default function Contact() {
               <div className="p-6 bg-primary text-white rounded-xl">
                 <Building2 className="h-8 w-8 mb-4 text-accent" />
                 <h4 className="font-serif font-bold text-xl mb-2">Corporate Information</h4>
-                <p className="text-white/80 text-sm">NMLS ID: #1234567<br/>Equal Housing Lender</p>
+                <p className="text-white/80 text-sm">Equal Housing Lender</p>
               </div>
             </div>
 
