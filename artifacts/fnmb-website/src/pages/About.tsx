@@ -34,36 +34,49 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
-              className="grid grid-cols-3 gap-4"
+              className="flex flex-col items-center gap-6"
             >
-              {[
-                { src: teamMember1, alt: "Edward Frish", name: "Edward Frish", title: "President / Broker / Owner" },
-                { src: teamMember2, alt: "Annabel R.", name: "Annabel R.", title: "Real Estate Agent · Educator · Marketing" },
-                { src: teamMember3, alt: "Gaudy R.", name: "Gaudy R.", title: "Transaction Coordinator · Office Manager" },
-              ].map((member, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.5 }}
-                  className="flex flex-col items-center gap-2"
-                >
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-white ring-2 ring-accent/30">
-                    <img
-                      src={member.src}
-                      alt={member.alt}
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
-                  {member.name && (
-                    <div className="text-center">
+              {/* Top: Edward centered */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col items-center gap-2"
+              >
+                <div className="w-44 h-44 rounded-2xl overflow-hidden shadow-xl border-4 border-white ring-2 ring-accent/40">
+                  <img src={teamMember1} alt="Edward Frish" className="w-full h-full object-cover object-top" />
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-primary text-sm leading-tight">Edward Frish</p>
+                  <p className="text-accent text-xs font-medium mt-0.5">President / Broker / Owner</p>
+                </div>
+              </motion.div>
+
+              {/* Bottom row: Annabel left, Gaudy right */}
+              <div className="flex gap-8 justify-center">
+                {[
+                  { src: teamMember2, alt: "Annabel R.", name: "Annabel R.", title: "Real Estate Agent · Educator · Marketing", delay: 0.15 },
+                  { src: teamMember3, alt: "Gaudy R.", name: "Gaudy R.", title: "Transaction Coordinator · Office Manager", delay: 0.3 },
+                ].map((member, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: member.delay, duration: 0.5 }}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <div className="w-36 h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white ring-2 ring-accent/30">
+                      <img src={member.src} alt={member.alt} className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="text-center max-w-[130px]">
                       <p className="font-semibold text-primary text-sm leading-tight">{member.name}</p>
                       <p className="text-accent text-xs font-medium mt-0.5 leading-tight">{member.title}</p>
                     </div>
-                  )}
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
             
             <motion.div 
