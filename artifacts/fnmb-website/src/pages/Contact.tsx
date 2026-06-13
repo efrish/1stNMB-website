@@ -110,8 +110,26 @@ export default function Contact() {
 
               <div className="p-6 bg-primary text-white rounded-xl">
                 <Building2 className="h-8 w-8 mb-4 text-accent" />
-                <h4 className="font-serif font-bold text-xl mb-2">Corporate Information</h4>
-                <p className="text-white/80 text-sm">Equal Housing Lender</p>
+                <h4 className="font-serif font-bold text-xl mb-2">License Information</h4>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  DRE # 01875449<br/>
+                  NMLS # 327221<br/>
+                  Equal Housing Lender
+                </p>
+              </div>
+
+              {/* Google Maps Embed */}
+              <div className="rounded-xl overflow-hidden border border-border shadow-sm">
+                <iframe
+                  title="First Nationwide Mortgage Bank Office Location"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3302.8!2d-118.5814!3d34.1697!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c29822a0f1c3e3%3A0x0!2s21900%20Burbank%20Blvd%20%23205%2C%20Woodland%20Hills%2C%20CA%2091367!5e0!3m2!1sen!2sus!4v1700000000000"
+                  width="100%"
+                  height="220"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
             </div>
 

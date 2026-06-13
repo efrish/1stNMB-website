@@ -91,7 +91,7 @@ export function Footer() {
 
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-primary-foreground/60 text-sm text-center md:text-left">
-            &copy; {new Date().getFullYear()} First Nationwide Mortgage Bank. All rights reserved. Equal Housing Lender.
+            &copy; {new Date().getFullYear()} First Nationwide Mortgage Bank. All rights reserved. DRE # 01875449 | NMLS # 327221 | Equal Housing Lender.
           </p>
           <div className="flex gap-4 text-sm text-primary-foreground/60">
             <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
