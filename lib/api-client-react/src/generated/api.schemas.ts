@@ -8,3 +8,31 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type ApplicationSubmissionType =
+  (typeof ApplicationSubmissionType)[keyof typeof ApplicationSubmissionType];
+
+export const ApplicationSubmissionType = {
+  "long-term": "long-term",
+  "short-term": "short-term",
+} as const;
+
+export type ApplicationSubmissionData = { [key: string]: unknown };
+
+export interface ApplicationSubmission {
+  type: ApplicationSubmissionType;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  data: ApplicationSubmissionData;
+}
+
+export interface ApplicationResponse {
+  id: number;
+  message: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}

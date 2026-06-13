@@ -32,13 +32,33 @@ export default function ShortTermApplication() {
     }
   });
 
-  const onSubmit = async () => {
-    setIsSubmitted(true);
-    toast({
-      title: "Fast-Track Application Received",
-      description: "A commercial lending specialist will call you within 2 hours.",
-    });
-    window.scrollTo(0, 0);
+  const onSubmit = async (values: z.infer<typeof schema>) => {
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "short-term",
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          phone: values.phone,
+          data: {
+            "Loan Amount": `$${Number(values.loanAmount).toLocaleString()}`,
+            "Project Type": values.propertyType,
+            "Closing Timeline": values.timeline,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Submission failed");
+
+      setIsSubmitted(true);
+      toast({ title: "Fast-Track Application Received", description: "A commercial lending specialist will call you within 2 hours." });
+      window.scrollTo(0, 0);
+    } catch {
+      toast({ title: "Submission Error", description: "Please try again or call us at (818) 371-1665.", variant: "destructive" });
+    }
   };
 
   if (isSubmitted) {

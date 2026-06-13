@@ -14,3 +14,16 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Saves application to database and sends email notification
+ * @summary Submit a mortgage application
+ */
+export const SubmitApplicationBody = zod.object({
+  type: zod.enum(["long-term", "short-term"]),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  email: zod.string(),
+  phone: zod.string(),
+  data: zod.record(zod.string(), zod.unknown()),
+});

@@ -5,18 +5,26 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  ApplicationResponse,
+  ApplicationSubmission,
+  ErrorResponse,
+  HealthStatus,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -99,3 +107,90 @@ export function useHealthCheck<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Saves application to database and sends email notification
+ * @summary Submit a mortgage application
+ */
+export const getSubmitApplicationUrl = () => {
+  return `/api/applications`;
+};
+
+export const submitApplication = async (
+  applicationSubmission: ApplicationSubmission,
+  options?: RequestInit,
+): Promise<ApplicationResponse> => {
+  return customFetch<ApplicationResponse>(getSubmitApplicationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(applicationSubmission),
+  });
+};
+
+export const getSubmitApplicationMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitApplication>>,
+    TError,
+    { data: BodyType<ApplicationSubmission> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitApplication>>,
+  TError,
+  { data: BodyType<ApplicationSubmission> },
+  TContext
+> => {
+  const mutationKey = ["submitApplication"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitApplication>>,
+    { data: BodyType<ApplicationSubmission> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitApplication(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitApplicationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitApplication>>
+>;
+export type SubmitApplicationMutationBody = BodyType<ApplicationSubmission>;
+export type SubmitApplicationMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit a mortgage application
+ */
+export const useSubmitApplication = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitApplication>>,
+    TError,
+    { data: BodyType<ApplicationSubmission> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitApplication>>,
+  TError,
+  { data: BodyType<ApplicationSubmission> },
+  TContext
+> => {
+  return useMutation(getSubmitApplicationMutationOptions(options));
+};

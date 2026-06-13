@@ -53,13 +53,41 @@ export default function LongTermApplication() {
 
   const submitApplication = async () => {
     const isValid = await financialForm.trigger();
-    if (isValid) {
-      setIsSubmitted(true);
-      toast({
-        title: "Application Submitted",
-        description: "Your long-term mortgage application has been received.",
+    if (!isValid) return;
+
+    const personal = personalForm.getValues();
+    const property = propertyForm.getValues();
+    const financial = financialForm.getValues();
+
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "long-term",
+          firstName: personal.firstName,
+          lastName: personal.lastName,
+          email: personal.email,
+          phone: personal.phone,
+          data: {
+            "SSN (last 4)": personal.ssn.slice(-4),
+            "Property Address": `${property.address}, ${property.city}, ${property.state} ${property.zip}`,
+            "Purchase Price": `$${Number(property.purchasePrice).toLocaleString()}`,
+            "Down Payment": `$${Number(property.downPayment).toLocaleString()}`,
+            "Annual Income": `$${Number(financial.annualIncome).toLocaleString()}`,
+            "Employer": financial.employer,
+            "Years Employed": financial.yearsEmployed,
+          },
+        }),
       });
+
+      if (!res.ok) throw new Error("Submission failed");
+
+      setIsSubmitted(true);
+      toast({ title: "Application Submitted", description: "Your long-term mortgage application has been received." });
       window.scrollTo(0, 0);
+    } catch {
+      toast({ title: "Submission Error", description: "Please try again or call us at (818) 371-1665.", variant: "destructive" });
     }
   };
 
