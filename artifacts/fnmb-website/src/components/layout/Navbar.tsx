@@ -28,7 +28,9 @@ export function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md py-2" : "bg-primary/95 text-white py-4 backdrop-blur-sm"
+        isScrolled
+          ? "bg-white shadow-md py-2 border-b border-border"
+          : "bg-primary text-white py-4 border-b-2 border-accent/60"
       }`}
     >
       {/* Top Bar for Contact Info */}
@@ -48,7 +50,7 @@ export function Navbar() {
           <img
             src={logoImg}
             alt="First Nationwide Mortgage Bank"
-            className={`h-14 w-auto object-contain transition-all duration-300 group-hover:opacity-90 ${isScrolled ? 'rounded-md shadow-sm' : ''}`}
+            className={`h-16 w-auto object-contain transition-all duration-300 group-hover:opacity-90 ${isScrolled ? 'rounded-md shadow-sm' : ''}`}
           />
         </Link>
 
