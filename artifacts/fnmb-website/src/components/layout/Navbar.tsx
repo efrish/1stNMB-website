@@ -50,7 +50,11 @@ export function Navbar() {
           <img
             src={logoImg}
             alt="First Nationwide Mortgage Bank"
-            className={`h-16 w-auto object-contain transition-all duration-300 group-hover:opacity-90 ${isScrolled ? 'rounded-md shadow-sm' : ''}`}
+            className={`h-16 w-auto object-contain transition-all duration-300 group-hover:opacity-90 rounded-lg ${
+              isScrolled
+                ? 'ring-1 ring-border shadow-sm'
+                : 'ring-2 ring-white/30 shadow-[0_0_16px_rgba(255,255,255,0.15)]'
+            }`}
           />
         </Link>
 
