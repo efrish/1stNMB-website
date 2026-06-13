@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, Shield, History, Target } from "lucide-react";
+import teamMember1 from "@assets/image_1781355661153.png";
+import teamMember2 from "@assets/image_1781355672927.png";
+import teamMember3 from "@assets/image_1781355683997.png";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -29,14 +32,32 @@ export default function About() {
       <section className="py-20">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div 
+            <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
+              className="grid grid-cols-3 gap-4"
             >
-              <img 
-                src="/images/team.png" 
-                alt="Our Team" 
-                className="rounded-xl shadow-2xl object-cover aspect-video w-full"
-              />
+              {[
+                { src: teamMember1, alt: "Team Member" },
+                { src: teamMember2, alt: "Team Member" },
+                { src: teamMember3, alt: "Team Member" },
+              ].map((member, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15, duration: 0.5 }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-white ring-2 ring-accent/30">
+                    <img
+                      src={member.src}
+                      alt={member.alt}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
             
             <motion.div 
