@@ -7,7 +7,7 @@ const router: IRouter = Router();
 
 function createTransporter() {
   const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
+  const user = process.env.GMAIL_FROM ?? process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
   if (!host || !user || !pass) {
@@ -58,32 +58,40 @@ router.post("/applications", async (req, res) => {
 
   const { type, firstName, lastName, email, phone, data } = parsed.data;
 
+  let savedId: number;
   try {
     const [saved] = await db
       .insert(applicationsTable)
       .values({ type, firstName, lastName, email, phone, data })
       .returning({ id: applicationsTable.id });
+    savedId = saved.id;
+  } catch (err) {
+    req.log.error(err, "Failed to save application to database");
+    res.status(500).json({ error: "Failed to submit application" });
+    return;
+  }
 
-    const transporter = createTransporter();
-    const notificationEmail = process.env.NOTIFICATION_EMAIL ?? "efrish@c21edva.com";
+  const transporter = createTransporter();
+  const notificationEmail = process.env.NOTIFICATION_EMAIL ?? "efrish@c21edva.com";
+  const fromAddress = process.env.GMAIL_FROM ?? process.env.SMTP_USER ?? "";
 
-    if (transporter) {
+  if (transporter) {
+    try {
       await transporter.sendMail({
-        from: `"FNMB Website" <${process.env.SMTP_USER}>`,
+        from: `"FNMB Website" <${fromAddress}>`,
         to: notificationEmail,
         subject: `New ${type === "long-term" ? "Long-Term" : "Bridge Loan"} Application — ${firstName} ${lastName}`,
         html: buildEmailHtml(type, firstName, lastName, email, phone, data as Record<string, unknown>),
       });
-      req.log.info({ applicationId: saved.id }, "Application saved and email sent");
-    } else {
-      req.log.warn({ applicationId: saved.id }, "Application saved — SMTP not configured, email skipped");
+      req.log.info({ applicationId: savedId }, "Application saved and email sent");
+    } catch (emailErr) {
+      req.log.warn({ applicationId: savedId, err: emailErr }, "Application saved but email failed — check SMTP credentials");
     }
-
-    res.status(201).json({ id: saved.id, message: "Application received" });
-  } catch (err) {
-    req.log.error(err, "Failed to save application");
-    res.status(500).json({ error: "Failed to submit application" });
+  } else {
+    req.log.warn({ applicationId: savedId }, "Application saved — SMTP not configured, email skipped");
   }
+
+  res.status(201).json({ id: savedId, message: "Application received" });
 });
 
 export default router;
