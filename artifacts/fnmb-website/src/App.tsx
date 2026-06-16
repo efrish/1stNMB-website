@@ -14,21 +14,37 @@ import BlogPost from "@/pages/BlogPost";
 import Contact from "@/pages/Contact";
 import LongTermApplication from "@/pages/LongTermApplication";
 import ShortTermApplication from "@/pages/ShortTermApplication";
+import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient();
+
+function PublicLayout() {
+  return (
+    <div className="min-h-[100dvh] flex flex-col font-sans">
+      <Navbar />
+      <main className="flex-1 mt-[72px] md:mt-[90px]">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/services" component={Services} />
+          <Route path="/blog" component={Blog} />
+          <Route path="/blog/:slug" component={BlogPost} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/long-term-application" component={LongTermApplication} />
+          <Route path="/short-term-application" component={ShortTermApplication} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
-      <Route path="/services" component={Services} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogPost} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/long-term-application" component={LongTermApplication} />
-      <Route path="/short-term-application" component={ShortTermApplication} />
-      <Route component={NotFound} />
+      <Route path="/admin" component={Admin} />
+      <Route component={PublicLayout} />
     </Switch>
   );
 }
@@ -38,13 +54,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <div className="min-h-[100dvh] flex flex-col font-sans">
-            <Navbar />
-            <main className="flex-1 mt-[72px] md:mt-[90px]">
-              <Router />
-            </main>
-            <Footer />
-          </div>
+          <Router />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
