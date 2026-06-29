@@ -1,0 +1,138 @@
+[
+  {
+    "id": "a1b2c3d4-0001-4000-8000-000000000001",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Title.tsx",
+    "title": "Title Slide",
+    "description": "First Nationwide Mortgage Bank — a complete digital rebuild.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0002-4000-8000-000000000002",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02StartingPoint.tsx",
+    "title": "The Starting Point",
+    "description": "What existed before: a sparse Wix page with no forms, no admin tools, and no email notifications.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0003-4000-8000-000000000003",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03Goals.tsx",
+    "title": "Project Goals",
+    "description": "Four problems and their four solutions: polished web presence, online applications, email notifications, admin dashboard.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0004-4000-8000-000000000004",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04TechStack.tsx",
+    "title": "Tech Stack",
+    "description": "Modern, type-safe stack: React + Vite, Express 5, PostgreSQL + Drizzle ORM, Zod, pnpm workspaces.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0005-4000-8000-000000000005",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05Architecture.tsx",
+    "title": "System Architecture",
+    "description": "One monorepo, three layers: website artifact, API server artifact, and shared DB library.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0006-4000-8000-000000000006",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06Website.tsx",
+    "title": "The Website",
+    "description": "Seven pages built from scratch in React: Home, About, Services, Blog, Contact, and two application pages.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0007-4000-8000-000000000007",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07Brand.tsx",
+    "title": "Brand & Design",
+    "description": "Navy primary, gold accent, diamond logo mark, Framer Motion animations, and a full shadcn/ui component system.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0008-4000-8000-000000000008",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08Team.tsx",
+    "title": "The Team",
+    "description": "Pyramid layout on the About page: Edward Frish (President), Annabel R., and Gaudy R.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0009-4000-8000-000000000009",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Forms.tsx",
+    "title": "Loan Application Forms",
+    "description": "Two forms built with react-hook-form + Zod — long-term mortgage and bridge loan, both POSTing to the API.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0010-4000-8000-000000000010",
+    "position": 10,
+    "filepath": "src/pages/slides/Slide10Database.tsx",
+    "title": "Database Layer",
+    "description": "PostgreSQL via Replit, Drizzle ORM for full type safety, JSONB field for flexible form data.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0011-4000-8000-000000000011",
+    "position": 11,
+    "filepath": "src/pages/slides/Slide11Email.tsx",
+    "title": "Email Notifications",
+    "description": "Gmail SMTP via Nodemailer sends a notification email on every new application submission.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0012-4000-8000-000000000012",
+    "position": 12,
+    "filepath": "src/pages/slides/Slide12AdminDashboard.tsx",
+    "title": "Admin Dashboard",
+    "description": "Password-protected /admin page with stats cards, searchable application table, and auto-refresh.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0013-4000-8000-000000000013",
+    "position": 13,
+    "filepath": "src/pages/slides/Slide13AdminAPI.tsx",
+    "title": "Admin API",
+    "description": "Bearer-token-secured REST endpoint returning all applications newest-first.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0014-4000-8000-000000000014",
+    "position": 14,
+    "filepath": "src/pages/slides/Slide14Deployment.tsx",
+    "title": "Deployment",
+    "description": "Live on Replit with autoscaling, isolated production/dev environments, and secure secrets.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0015-4000-8000-000000000015",
+    "position": 15,
+    "filepath": "src/pages/slides/Slide15GoingLive.tsx",
+    "title": "Going Live",
+    "description": "Two steps to replace 1stnmb.com: add the custom domain in Replit, then update DNS records.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0016-4000-8000-000000000016",
+    "position": 16,
+    "filepath": "src/pages/slides/Slide16NextSteps.tsx",
+    "title": "Next Steps",
+    "description": "Connect the domain, populate the blog, add analytics, and optional SMS notifications or client portal.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0017-4000-8000-000000000017",
+    "position": 17,
+    "filepath": "src/pages/slides/Slide17Closing.tsx",
+    "title": "Contact",
+    "description": "21900 Burbank Blvd., #205, Woodland Hills CA 91367 · (818) 371-1665 · info@1stnmb.com · 1stnmb.com",
+    "speakerNotes": ""
+  }
+]

@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/fnmb-deck/"
+title = "FNMB Project Deck"
+version = "1.0.0"
+id = "artifacts/fnmb-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/fnmb-deck/" ]
+localPort = 23844
+
+[services.development]
+run = "pnpm --filter @workspace/fnmb-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fnmb-deck", "run", "build" ]
+publicDir = "artifacts/fnmb-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23844"
+BASE_PATH = "/fnmb-deck/"
