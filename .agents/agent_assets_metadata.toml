@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "Syv_hElePfN3NrI8yKmvI"
@@ -24,3 +23,9 @@ id = "g5sKHax5ZDFs-B2vI_1T9"
 uri = "file://artifacts/fnmb-website/public/images/blog-2.png"
 type = "image"
 title = "Financial charts and coffee"
+
+[[outputs]]
+id = "hIpd3NzS0MjUvXTugHJ77"
+uri = "file://.local/outputs/FNMB-Project-Deck.pptx"
+type = "slides"
+title = "FNMB Project Deck (PPTX)"
