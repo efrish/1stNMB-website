@@ -96,6 +96,14 @@ export function Footer() {
             <a href="#" className="hover:text-accent transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-accent transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-accent transition-colors">Accessibility</a>
+            <a
+              href="https://f412641e-a0a0-4bdf-8119-de0aab8bc50f-00-2z44bpfoa3ie3.picard.replit.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-accent transition-colors"
+            >
+              Staff Login
+            </a>
           </div>
         </div>
       </div>

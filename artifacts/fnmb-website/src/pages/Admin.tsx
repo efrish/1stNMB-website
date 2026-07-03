@@ -163,6 +163,7 @@ export default function Admin() {
       const interval = setInterval(() => fetchApplications(password), 30000);
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [password]);
 
   if (!password) return <LoginScreen onLogin={handleLogin} />;

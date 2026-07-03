@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone, Mail, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoImg from "@assets/image_1781355777242.png";
+
+const CRM_URL = "https://f412641e-a0a0-4bdf-8119-de0aab8bc50f-00-2z44bpfoa3ie3.picard.replit.dev";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,6 +45,15 @@ export function Navbar() {
           <Mail className="h-4 w-4" />
           <span>info@1stnmb.com</span>
         </div>
+        <a
+          href={CRM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 hover:text-accent transition-colors"
+        >
+          <LogIn className="h-4 w-4" />
+          <span>Staff Login</span>
+        </a>
       </div>
 
       <div className="container mx-auto px-4 flex justify-between items-center">
@@ -127,6 +138,16 @@ export function Navbar() {
               <span>info@1stnmb.com</span>
             </div>
           </div>
+          <a
+            href={CRM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground border border-border rounded-lg py-2.5 mt-2"
+            onClick={() => setIsOpen(false)}
+          >
+            <LogIn className="h-4 w-4" />
+            <span>Staff Login</span>
+          </a>
         </div>
       )}
     </header>
