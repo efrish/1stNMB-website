@@ -4,7 +4,7 @@ import { Menu, X, Phone, Mail, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoImg from "@assets/image_1781355777242.png";
 
-const CRM_URL = "https://f412641e-a0a0-4bdf-8119-de0aab8bc50f-00-2z44bpfoa3ie3.picard.replit.dev";
+const CRM_URL = "https://century-hollywood-crm.replit.app";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
