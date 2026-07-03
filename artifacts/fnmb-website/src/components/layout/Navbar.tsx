@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, Phone, Mail, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logoImg from "@assets/image_1781355777242.png";
+import logoIcon from "@assets/fnmb-icon.png";
 
 const CRM_URL = "https://century-hollywood-crm.replit.app";
 
@@ -57,16 +57,24 @@ export function Navbar() {
       </div>
 
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center group">
+        <Link href="/" className="flex items-center gap-3 group">
           <img
-            src={logoImg}
+            src={logoIcon}
             alt="First Nationwide Mortgage Bank"
-            className={`h-16 w-auto object-contain transition-all duration-300 group-hover:opacity-90 rounded-lg ${
-              isScrolled
-                ? 'ring-1 ring-border shadow-sm'
-                : 'ring-2 ring-white/30 shadow-[0_0_16px_rgba(255,255,255,0.15)]'
-            }`}
+            className="h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
           />
+          <div className="flex flex-col leading-none">
+            <span
+              className={`font-bold text-lg md:text-xl tracking-tight whitespace-nowrap transition-colors ${
+                isScrolled ? "text-primary" : "text-white"
+              }`}
+            >
+              First Nationwide Mortgage Bank
+            </span>
+            <span className="text-[10px] md:text-[11px] font-semibold tracking-[0.2em] uppercase mt-1 text-accent">
+              Your Path to Home Ownership
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Nav */}

@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Phone, Mail, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
-import logoImg from "@assets/image_1781355777242.png";
+import logoIcon from "@assets/fnmb-icon.png";
 
 export function Footer() {
   return (
@@ -9,12 +9,20 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="mb-6">
+            <div className="mb-6 flex items-center gap-3">
               <img
-                src={logoImg}
+                src={logoIcon}
                 alt="First Nationwide Mortgage Bank"
-                className="h-20 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-lg text-white tracking-tight">
+                  First Nationwide Mortgage Bank
+                </span>
+                <span className="text-[10px] font-semibold tracking-[0.2em] uppercase mt-1 text-accent">
+                  Your Path to Home Ownership
+                </span>
+              </div>
             </div>
             <p className="text-primary-foreground/80 leading-relaxed text-sm">
               Your trusted partner in home ownership and real estate investment. Expert mortgage solutions tailored to your financial goals.
