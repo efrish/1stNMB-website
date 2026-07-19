@@ -39,7 +39,7 @@ export default function LongTermApplication() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Forms
-  const personalForm = useForm({ resolver: zodResolver(personalSchema), defaultValues: { firstName: "", lastName: "", email: "", phone: "", ssn: "" } });
+  const personalForm = useForm({ resolver: zodResolver(personalSchema), defaultValues: { firstName: "", lastName: "", email: "", phone: "" } });
   const propertyForm = useForm({ resolver: zodResolver(propertySchema), defaultValues: { address: "", city: "", state: "", zip: "", purchasePrice: 0, downPayment: 0 } });
   const financialForm = useForm({ resolver: zodResolver(financialSchema), defaultValues: { annualIncome: 0, employer: "", yearsEmployed: 0 } });
 
@@ -170,9 +170,6 @@ export default function LongTermApplication() {
                         <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
-                    <FormField control={personalForm.control} name="ssn" render={({ field }) => (
-                      <FormItem><FormLabel>Social Security Number</FormLabel><FormControl><Input type="password" placeholder="XXX-XX-XXXX" {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
                     <Button type="button" size="lg" className="w-full mt-6" onClick={() => nextStep(personalForm)}>
                       Continue <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
