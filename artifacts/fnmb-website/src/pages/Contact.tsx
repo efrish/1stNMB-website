@@ -33,17 +33,46 @@ export default function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const nameParts = values.name.trim().split(/\s+/);
+    const firstName = nameParts.shift() ?? "Website";
+    const lastName = nameParts.join(" ") || "Inquiry";
+
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: values.inquiryType === "long-term" ? "long-term" : "short-term",
+          firstName,
+          lastName,
+          email: values.email,
+          phone: values.phone,
+          data: {
+            "Submission Type": "Contact Form",
+            "Inquiry Type": values.inquiryType,
+            "Message": values.message,
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Submission failed");
+
       toast({
         title: "Message Sent Successfully",
-        description: "One of our advisors will contact you shortly.",
+        description: "A loan specialist will review your request and respond within 24–48 hours.",
       });
       form.reset();
-    }, 1500);
+    } catch {
+      toast({
+        title: "Message Not Sent",
+        description: "Please try again or call us at (818) 371-1665.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
