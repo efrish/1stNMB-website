@@ -40,7 +40,6 @@ SMTP_PORT = "587"
 SMTP_SECURE = "false"
 NOTIFICATION_EMAIL = "efrish@c21edva.com"
 GMAIL_FROM = "century21hollywoodbroker@gmail.com"
-ADMIN_PASSWORD = "fnmb-admin-2025"
 NOTIFICATION_PHONE = "+18183711665"
 
 [nix]
