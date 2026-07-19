@@ -70,7 +70,6 @@ export default function LongTermApplication() {
           email: personal.email,
           phone: personal.phone,
           data: {
-            "SSN (last 4)": personal.ssn.slice(-4),
             "Property Address": `${property.address}, ${property.city}, ${property.state} ${property.zip}`,
             "Purchase Price": `$${Number(property.purchasePrice).toLocaleString()}`,
             "Down Payment": `$${Number(property.downPayment).toLocaleString()}`,
