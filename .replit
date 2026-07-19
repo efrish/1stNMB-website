@@ -14,6 +14,7 @@ runButton = "Project"
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
+integrations = ["twilio:1.0.0"]
 
 [postMerge]
 path = "scripts/post-merge.sh"
@@ -40,3 +41,7 @@ SMTP_SECURE = "false"
 NOTIFICATION_EMAIL = "efrish@c21edva.com"
 GMAIL_FROM = "century21hollywoodbroker@gmail.com"
 ADMIN_PASSWORD = "fnmb-admin-2025"
+NOTIFICATION_PHONE = "+18183711665"
+
+[nix]
+channel = "stable-25_05"
