@@ -6,6 +6,19 @@ import { SubmitApplicationBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character] ?? character;
+  });
+}
+
 function createTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.GMAIL_FROM ?? process.env.SMTP_USER;
@@ -25,28 +38,32 @@ function createTransporter() {
 
 function buildEmailHtml(type: string, firstName: string, lastName: string, email: string, phone: string, data: Record<string, unknown>) {
   const typeLabel = type === "long-term" ? "Long-Term Mortgage" : "Short-Term / Bridge Loan";
+  const safeFirstName = escapeHtml(firstName);
+  const safeLastName = escapeHtml(lastName);
+  const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone);
   const rows = Object.entries(data)
-    .map(([k, v]) => `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;color:#666;font-size:13px;">${k}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;">${v}</td></tr>`)
+    .map(([k, v]) => `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;color:#666;font-size:13px;">${escapeHtml(k)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;">${escapeHtml(v)}</td></tr>`)
     .join("");
 
   return `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:8px;">
       <div style="background:#0B2F5B;padding:20px 24px;border-radius:6px 6px 0 0;">
-        <h1 style="color:#fff;margin:0;font-size:20px;">🔥 HOT LEAD — New ${typeLabel} Application</h1>
-        <p style="color:#8ab4e8;margin:4px 0 0;font-size:13px;">First Nationwide Mortgage Bank — Call this client NOW</p>
+        <h1 style="color:#fff;margin:0;font-size:20px;">New ${typeLabel} Loan Request</h1>
+        <p style="color:#8ab4e8;margin:4px 0 0;font-size:13px;">First Nationwide Mortgage Bank — specialist review requested</p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 6px 6px;border:1px solid #e0e0e0;">
         <h2 style="color:#0B2F5B;font-size:16px;margin-top:0;">Applicant</h2>
-        <p style="margin:0 0 4px;"><strong>${firstName} ${lastName}</strong></p>
-        <p style="margin:0 0 4px;color:#555;">📧 ${email}</p>
-        <p style="margin:0 0 20px;color:#555;">📞 ${phone}</p>
+        <p style="margin:0 0 4px;"><strong>${safeFirstName} ${safeLastName}</strong></p>
+        <p style="margin:0 0 4px;color:#555;">📧 ${safeEmail}</p>
+        <p style="margin:0 0 20px;color:#555;">📞 ${safePhone}</p>
         <h2 style="color:#0B2F5B;font-size:16px;">Application Details</h2>
         <table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-radius:4px;">
           ${rows}
         </table>
         <div style="margin-top:20px;padding:12px 16px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;">
-          <strong style="color:#856404;">⚡ Action Required:</strong>
-          <span style="color:#856404;"> Call ${firstName} at ${phone} right away — they just submitted an application and are ready to talk.</span>
+          <strong style="color:#856404;">Follow-up:</strong>
+          <span style="color:#856404;"> Review this request and respond within the stated 24–48 hour timeframe.</span>
         </div>
         <p style="margin-top:16px;font-size:12px;color:#999;">Submitted via 1stnmb.com</p>
       </div>
@@ -59,7 +76,7 @@ async function sendSmsAlert(firstName: string, lastName: string, phone: string, 
   if (!toPhone) return;
 
   const typeLabel = type === "long-term" ? "Long-Term Mortgage" : "Bridge Loan";
-  const message = `🔥 HOT LEAD — FNMB\n${firstName} ${lastName} just submitted a ${typeLabel} application.\nCall them NOW: ${phone}\nView in admin: https://web-enhancer-efrish.replit.app/admin (ID #${applicationId})`;
+  const message = `New FNMB lead\n${firstName} ${lastName} submitted a ${typeLabel} request.\nPhone: ${phone}\nReview: https://1stnmb.com/admin (ID #${applicationId})`;
 
   try {
     const connectors = new ReplitConnectors();
@@ -116,7 +133,7 @@ router.post("/applications", async (req, res) => {
       await transporter.sendMail({
         from: `"FNMB Website" <${fromAddress}>`,
         to: notificationEmail,
-        subject: `🔥 HOT LEAD — ${type === "long-term" ? "Long-Term" : "Bridge Loan"} Application — ${firstName} ${lastName} — CALL NOW`,
+        subject: `New FNMB ${type === "long-term" ? "Long-Term" : "Bridge Loan"} Request — ${firstName} ${lastName}`,
         html: buildEmailHtml(type, firstName, lastName, email, phone, data as Record<string, unknown>),
       });
       req.log.info({ applicationId: savedId }, "Application saved and email sent");
