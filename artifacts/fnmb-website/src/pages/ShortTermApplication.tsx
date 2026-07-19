@@ -15,7 +15,7 @@ const schema = z.object({
   lastName: z.string().min(2, "Required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Required"),
-  loanAmount: z.coerce.number().min(50000, "Minimum $50k"),
+  loanAmount: z.coerce.number().min(1, "Enter the requested loan amount"),
   propertyType: z.string().min(1, "Required"),
   timeline: z.string().min(1, "Required"),
 });
@@ -54,7 +54,7 @@ export default function ShortTermApplication() {
       if (!res.ok) throw new Error("Submission failed");
 
       setIsSubmitted(true);
-      toast({ title: "Fast-Track Application Received", description: "A commercial lending specialist will call you within 2 hours." });
+      toast({ title: "Loan Request Received", description: "A loan specialist will review your request and respond within 24–48 hours." });
       window.scrollTo(0, 0);
     } catch {
       toast({ title: "Submission Error", description: "Please try again or call us at (818) 371-1665.", variant: "destructive" });
@@ -73,7 +73,7 @@ export default function ShortTermApplication() {
           </div>
           <h1 className="font-serif text-3xl font-bold text-primary mb-4">Request Priority Queued</h1>
           <p className="text-muted-foreground mb-8 text-lg">
-            Because time is money, your bridge loan request has been sent directly to our priority commercial desk. Expect a call shortly.
+            Your bridge or hard-money request has been received for case-by-case review. A loan specialist will respond within 24–48 hours.
           </p>
           <Link href="/">
             <Button size="lg" className="w-full">Return to Home</Button>
@@ -97,7 +97,7 @@ export default function ShortTermApplication() {
             <Clock className="h-8 w-8 text-accent shrink-0" />
             <div>
               <h3 className="font-bold text-lg">Speed is Everything</h3>
-              <p className="text-primary-foreground/70 text-sm">Approvals in 24 hours. Funding in as little as 10 days.</p>
+              <p className="text-primary-foreground/70 text-sm">Same-day attention with a case-by-case review of every request.</p>
             </div>
           </div>
           <div className="flex gap-4">
@@ -110,8 +110,8 @@ export default function ShortTermApplication() {
           <div className="flex gap-4">
             <Banknote className="h-8 w-8 text-accent shrink-0" />
             <div>
-              <h3 className="font-bold text-lg">Up to 90% LTC</h3>
-              <p className="text-primary-foreground/70 text-sm">High leverage options to maximize your capital.</p>
+              <h3 className="font-bold text-lg">Case-by-Case Terms</h3>
+              <p className="text-primary-foreground/70 text-sm">Loan structure, leverage, pricing, and timing depend on the property and transaction.</p>
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@ export default function ShortTermApplication() {
                 </div>
 
                 <Button type="submit" size="lg" className="w-full text-lg h-14 bg-accent text-primary hover:bg-accent/90">
-                  Request Immediate Callback <ArrowRight className="ml-2 h-5 w-5" />
+                  Submit Loan Request <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </form>
             </Form>
