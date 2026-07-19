@@ -144,10 +144,10 @@ router.post("/applications", async (req, res) => {
     req.log.warn({ applicationId: savedId }, "Application saved — SMTP not configured, email skipped");
   }
 
-  // Send SMS hot-lead alert via Twilio
+  // Send owner SMS notification via Twilio
   try {
     await sendSmsAlert(firstName, lastName, phone, type, savedId);
-    req.log.info({ applicationId: savedId }, "SMS hot-lead alert sent");
+    req.log.info({ applicationId: savedId }, "SMS lead alert sent");
   } catch (smsErr) {
     req.log.warn({ applicationId: savedId, err: smsErr }, "Application saved but SMS alert failed — check Twilio config");
   }
