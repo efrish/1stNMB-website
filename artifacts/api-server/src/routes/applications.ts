@@ -136,6 +136,47 @@ function buildEmailHtml(type: string, firstName: string, lastName: string, email
   `;
 }
 
+function buildBorrowerConfirmationHtml(firstName: string): string {
+  const bookingUrl = process.env.OUTLOOK_BOOKING_URL?.trim();
+  const bookingLink = bookingUrl
+    ? `<p style="margin-top:20px;"><a href="${escapeHtml(bookingUrl)}" style="background:#0B2F5B;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;">Schedule a Call</a></p>`
+    : "";
+
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+      <h1 style="color:#0B2F5B;font-size:22px;">We received your loan request</h1>
+      <p>Hello ${escapeHtml(firstName)},</p>
+      <p>Thank you for contacting First Nationwide Mortgage Bank. A loan specialist will review your request case by case and respond within 24–48 hours.</p>
+      <p>No loan terms or approval have been issued. If we need more information, we will contact you using the information you provided.</p>
+      ${bookingLink}
+      <p style="margin-top:24px;color:#666;font-size:12px;">DRE #01875449 · NMLS #327221</p>
+    </div>
+  `;
+}
+
+async function sendBorrowerSms(firstName: string, phone: string): Promise<void> {
+  if (!phone) return;
+
+  const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+  const twilioPhoneNumber = process.env.TWILIO_FROM_PHONE;
+  if (!twilioAccountSid || !twilioPhoneNumber) return;
+
+  const bookingUrl = process.env.OUTLOOK_BOOKING_URL?.trim();
+  const scheduleText = bookingUrl ? ` Schedule a call: ${bookingUrl}` : "";
+  const message = `FNMB: Hi ${firstName}, we received your loan request. A specialist will review it and respond within 24–48 hours.${scheduleText} Reply STOP to opt out.`;
+
+  const connectors = new ReplitConnectors();
+  await connectors.proxy("twilio", `/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      To: phone,
+      From: twilioPhoneNumber,
+      Body: message,
+    }).toString(),
+  });
+}
+
 async function sendSmsAlert(firstName: string, lastName: string, phone: string, type: string, applicationId: number): Promise<void> {
   const toPhone = process.env.NOTIFICATION_PHONE;
   if (!toPhone) return;
@@ -241,12 +282,39 @@ router.post("/applications", async (req, res) => {
     req.log.warn({ applicationId: savedId }, "Application saved — SMTP not configured, email skipped");
   }
 
+  if (transporter && email) {
+    try {
+      await transporter.sendMail({
+        from: `"First Nationwide Mortgage Bank" <${fromAddress}>`,
+        to: email,
+        subject: "We received your FNMB loan request",
+        html: buildBorrowerConfirmationHtml(firstName),
+      });
+      req.log.info({ applicationId: savedId }, "Borrower confirmation email sent");
+    } catch (emailErr) {
+      req.log.warn(
+        { applicationId: savedId, err: emailErr },
+        "Application saved but borrower confirmation email failed",
+      );
+    }
+  }
+
   // Send owner SMS notification via Twilio
   try {
     await sendSmsAlert(firstName, lastName, phone, type, savedId);
     req.log.info({ applicationId: savedId }, "SMS lead alert sent");
   } catch (smsErr) {
     req.log.warn({ applicationId: savedId, err: smsErr }, "Application saved but SMS alert failed — check Twilio config");
+  }
+
+  try {
+    await sendBorrowerSms(firstName, phone);
+    req.log.info({ applicationId: savedId }, "Borrower confirmation SMS sent");
+  } catch (smsErr) {
+    req.log.warn(
+      { applicationId: savedId, err: smsErr },
+      "Application saved but borrower confirmation SMS failed",
+    );
   }
 
   res.status(201).json({ id: savedId, message: "Application received" });
