@@ -23,6 +23,7 @@ const schema = z.object({
 export default function ShortTermApplication() {
   const { toast } = useToast();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -33,6 +34,15 @@ export default function ShortTermApplication() {
   });
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
+    if (!contactConsent) {
+      toast({
+        title: "Consent Required",
+        description: "Please authorize us to contact you about this loan request.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const res = await fetch("/api/applications", {
         method: "POST",
@@ -47,6 +57,7 @@ export default function ShortTermApplication() {
             "Loan Amount": `$${Number(values.loanAmount).toLocaleString()}`,
             "Project Type": values.propertyType,
             "Closing Timeline": values.timeline,
+            "Contact Consent": "Yes — phone, text, and email about this request",
           },
         }),
       });
@@ -180,6 +191,18 @@ export default function ShortTermApplication() {
                     )} />
                   </div>
                 </div>
+
+                <label className="flex items-start gap-3 rounded-lg border border-border bg-white p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={contactConsent}
+                    onChange={(event) => setContactConsent(event.target.checked)}
+                    className="mt-1 h-4 w-4"
+                  />
+                  <span>
+                    By submitting, I agree that First Nationwide Mortgage Bank may contact me about this request by phone, text, or email at the information provided. Consent is not a condition of obtaining services. Message and data rates may apply.
+                  </span>
+                </label>
 
                 <Button type="submit" size="lg" className="w-full text-lg h-14 bg-accent text-primary hover:bg-accent/90">
                   Submit Loan Request <ArrowRight className="ml-2 h-5 w-5" />
