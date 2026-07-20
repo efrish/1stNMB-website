@@ -15,7 +15,6 @@ const personalSchema = z.object({
   lastName: z.string().min(2, "Required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Required"),
-  ssn: z.string().min(9, "Required"),
 });
 
 const propertySchema = z.object({
@@ -37,9 +36,10 @@ export default function LongTermApplication() {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
 
   // Forms
-  const personalForm = useForm({ resolver: zodResolver(personalSchema), defaultValues: { firstName: "", lastName: "", email: "", phone: "", ssn: "" } });
+  const personalForm = useForm({ resolver: zodResolver(personalSchema), defaultValues: { firstName: "", lastName: "", email: "", phone: "" } });
   const propertyForm = useForm({ resolver: zodResolver(propertySchema), defaultValues: { address: "", city: "", state: "", zip: "", purchasePrice: 0, downPayment: 0 } });
   const financialForm = useForm({ resolver: zodResolver(financialSchema), defaultValues: { annualIncome: 0, employer: "", yearsEmployed: 0 } });
 
@@ -54,6 +54,14 @@ export default function LongTermApplication() {
   const submitApplication = async () => {
     const isValid = await financialForm.trigger();
     if (!isValid) return;
+    if (!contactConsent) {
+      toast({
+        title: "Consent Required",
+        description: "Please authorize us to contact you about this loan request.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const personal = personalForm.getValues();
     const property = propertyForm.getValues();
@@ -70,13 +78,13 @@ export default function LongTermApplication() {
           email: personal.email,
           phone: personal.phone,
           data: {
-            "SSN (last 4)": personal.ssn.slice(-4),
             "Property Address": `${property.address}, ${property.city}, ${property.state} ${property.zip}`,
             "Purchase Price": `$${Number(property.purchasePrice).toLocaleString()}`,
             "Down Payment": `$${Number(property.downPayment).toLocaleString()}`,
             "Annual Income": `$${Number(financial.annualIncome).toLocaleString()}`,
             "Employer": financial.employer,
             "Years Employed": financial.yearsEmployed,
+            "Contact Consent": "Yes — phone, text, and email about this request",
           },
         }),
       });
@@ -103,7 +111,7 @@ export default function LongTermApplication() {
           </div>
           <h1 className="font-serif text-3xl font-bold text-primary mb-4">Application Received!</h1>
           <p className="text-muted-foreground mb-8">
-            Thank you for choosing First Nationwide. A senior loan officer will review your file and contact you within 24 hours.
+            Thank you for choosing First Nationwide. A senior loan officer will review your file and contact you within 24–48 hours.
           </p>
           <Link href="/">
             <Button size="lg" className="w-full">Return to Home</Button>
@@ -118,7 +126,7 @@ export default function LongTermApplication() {
       <div className="bg-primary pt-12 pb-24 text-white">
         <div className="container mx-auto px-4 max-w-3xl text-center">
           <h1 className="font-serif text-4xl font-bold mb-4">Long-Term Mortgage Application</h1>
-          <p className="text-primary-foreground/80">Secure, fast, and transparent pre-approval process.</p>
+          <p className="text-primary-foreground/80">Submit your information for a case-by-case review by a loan specialist.</p>
         </div>
       </div>
 
@@ -170,9 +178,6 @@ export default function LongTermApplication() {
                         <FormItem><FormLabel>Phone</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                       )} />
                     </div>
-                    <FormField control={personalForm.control} name="ssn" render={({ field }) => (
-                      <FormItem><FormLabel>Social Security Number</FormLabel><FormControl><Input type="password" placeholder="XXX-XX-XXXX" {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
                     <Button type="button" size="lg" className="w-full mt-6" onClick={() => nextStep(personalForm)}>
                       Continue <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -273,6 +278,18 @@ export default function LongTermApplication() {
                     </div>
                   </div>
                 </div>
+
+                <label className="flex items-start gap-3 rounded-lg border border-border bg-white p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={contactConsent}
+                    onChange={(event) => setContactConsent(event.target.checked)}
+                    className="mt-1 h-4 w-4"
+                  />
+                  <span>
+                    By submitting, I agree that First Nationwide Mortgage Bank may contact me about this request by phone, text, or email at the information provided. Consent is not a condition of obtaining services. Message and data rates may apply.
+                  </span>
+                </label>
 
                 <div className="flex gap-4 pt-4">
                   <Button type="button" variant="outline" onClick={() => setStep(3)}>Back to Edit</Button>

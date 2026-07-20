@@ -6,6 +6,84 @@ import { SubmitApplicationBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
+function escapeHtml(value: unknown): string {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entities[character] ?? character;
+  });
+}
+
+function applicationDetails(data: Record<string, unknown>): string {
+  return Object.entries(data)
+    .map(([key, value]) => `${key}: ${String(value ?? "")}`)
+    .join("\n");
+}
+
+function hasContactConsent(data: Record<string, unknown>): boolean {
+  return String(data["Contact Consent"] ?? "").toLowerCase().startsWith("yes");
+}
+
+function requestedLoanAmount(data: Record<string, unknown>): number | undefined {
+  const entry = Object.entries(data).find(([key]) => {
+    const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
+    return normalized.includes("loanamount") || normalized.includes("requestedamount");
+  });
+  if (!entry) return undefined;
+
+  const amount = Number(String(entry[1] ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(amount) && amount > 0 ? amount : undefined;
+}
+
+async function sendToCrm(
+  type: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone: string,
+  data: Record<string, unknown>,
+): Promise<{ leadId?: number; status?: string } | null> {
+  const baseUrl = process.env.CRM_BASE_URL?.trim().replace(/\/$/, "");
+  const secret = process.env.CRM_WEBHOOK_SECRET?.trim();
+
+  if (!baseUrl || !secret) {
+    return null;
+  }
+
+  const response = await fetch(`${baseUrl}/api/webhook/mortgage-inquiry`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": secret,
+    },
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      email,
+      phone,
+      loanType: type === "long-term" ? "Long-Term Mortgage" : "Short-Term / Bridge Loan",
+      loanAmount: requestedLoanAmount(data),
+      message: applicationDetails(data),
+      source: "1stnmb-website",
+      consent: hasContactConsent(data),
+      consentVersion: "2026-07-20",
+    }),
+    signal: AbortSignal.timeout(8_000),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`CRM returned ${response.status}: ${body.slice(0, 300)}`);
+  }
+
+  return response.json() as Promise<{ leadId?: number; status?: string }>;
+}
+
 function createTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.GMAIL_FROM ?? process.env.SMTP_USER;
@@ -25,28 +103,32 @@ function createTransporter() {
 
 function buildEmailHtml(type: string, firstName: string, lastName: string, email: string, phone: string, data: Record<string, unknown>) {
   const typeLabel = type === "long-term" ? "Long-Term Mortgage" : "Short-Term / Bridge Loan";
+  const safeFirstName = escapeHtml(firstName);
+  const safeLastName = escapeHtml(lastName);
+  const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone);
   const rows = Object.entries(data)
-    .map(([k, v]) => `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;color:#666;font-size:13px;">${k}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;">${v}</td></tr>`)
+    .map(([k, v]) => `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;color:#666;font-size:13px;">${escapeHtml(k)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;">${escapeHtml(v)}</td></tr>`)
     .join("");
 
   return `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:8px;">
       <div style="background:#0B2F5B;padding:20px 24px;border-radius:6px 6px 0 0;">
-        <h1 style="color:#fff;margin:0;font-size:20px;">🔥 HOT LEAD — New ${typeLabel} Application</h1>
-        <p style="color:#8ab4e8;margin:4px 0 0;font-size:13px;">First Nationwide Mortgage Bank — Call this client NOW</p>
+        <h1 style="color:#fff;margin:0;font-size:20px;">New ${typeLabel} Loan Request</h1>
+        <p style="color:#8ab4e8;margin:4px 0 0;font-size:13px;">First Nationwide Mortgage Bank — specialist review requested</p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 6px 6px;border:1px solid #e0e0e0;">
         <h2 style="color:#0B2F5B;font-size:16px;margin-top:0;">Applicant</h2>
-        <p style="margin:0 0 4px;"><strong>${firstName} ${lastName}</strong></p>
-        <p style="margin:0 0 4px;color:#555;">📧 ${email}</p>
-        <p style="margin:0 0 20px;color:#555;">📞 ${phone}</p>
+        <p style="margin:0 0 4px;"><strong>${safeFirstName} ${safeLastName}</strong></p>
+        <p style="margin:0 0 4px;color:#555;">📧 ${safeEmail}</p>
+        <p style="margin:0 0 20px;color:#555;">📞 ${safePhone}</p>
         <h2 style="color:#0B2F5B;font-size:16px;">Application Details</h2>
         <table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-radius:4px;">
           ${rows}
         </table>
         <div style="margin-top:20px;padding:12px 16px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;">
-          <strong style="color:#856404;">⚡ Action Required:</strong>
-          <span style="color:#856404;"> Call ${firstName} at ${phone} right away — they just submitted an application and are ready to talk.</span>
+          <strong style="color:#856404;">Follow-up:</strong>
+          <span style="color:#856404;"> Review this request and respond within the stated 24–48 hour timeframe.</span>
         </div>
         <p style="margin-top:16px;font-size:12px;color:#999;">Submitted via 1stnmb.com</p>
       </div>
@@ -54,12 +136,53 @@ function buildEmailHtml(type: string, firstName: string, lastName: string, email
   `;
 }
 
+function buildBorrowerConfirmationHtml(firstName: string): string {
+  const bookingUrl = process.env.OUTLOOK_BOOKING_URL?.trim();
+  const bookingLink = bookingUrl
+    ? `<p style="margin-top:20px;"><a href="${escapeHtml(bookingUrl)}" style="background:#0B2F5B;color:#fff;padding:12px 18px;border-radius:6px;text-decoration:none;">Schedule a Call</a></p>`
+    : "";
+
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+      <h1 style="color:#0B2F5B;font-size:22px;">We received your loan request</h1>
+      <p>Hello ${escapeHtml(firstName)},</p>
+      <p>Thank you for contacting First Nationwide Mortgage Bank. A loan specialist will review your request case by case and respond within 24–48 hours.</p>
+      <p>No loan terms or approval have been issued. If we need more information, we will contact you using the information you provided.</p>
+      ${bookingLink}
+      <p style="margin-top:24px;color:#666;font-size:12px;">DRE #01875449 · NMLS #327221</p>
+    </div>
+  `;
+}
+
+async function sendBorrowerSms(firstName: string, phone: string): Promise<void> {
+  if (!phone) return;
+
+  const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+  const twilioPhoneNumber = process.env.TWILIO_FROM_PHONE;
+  if (!twilioAccountSid || !twilioPhoneNumber) return;
+
+  const bookingUrl = process.env.OUTLOOK_BOOKING_URL?.trim();
+  const scheduleText = bookingUrl ? ` Schedule a call: ${bookingUrl}` : "";
+  const message = `FNMB: Hi ${firstName}, we received your loan request. A specialist will review it and respond within 24–48 hours.${scheduleText} Reply STOP to opt out.`;
+
+  const connectors = new ReplitConnectors();
+  await connectors.proxy("twilio", `/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      To: phone,
+      From: twilioPhoneNumber,
+      Body: message,
+    }).toString(),
+  });
+}
+
 async function sendSmsAlert(firstName: string, lastName: string, phone: string, type: string, applicationId: number): Promise<void> {
   const toPhone = process.env.NOTIFICATION_PHONE;
   if (!toPhone) return;
 
   const typeLabel = type === "long-term" ? "Long-Term Mortgage" : "Bridge Loan";
-  const message = `🔥 HOT LEAD — FNMB\n${firstName} ${lastName} just submitted a ${typeLabel} application.\nCall them NOW: ${phone}\nView in admin: https://web-enhancer-efrish.replit.app/admin (ID #${applicationId})`;
+  const message = `New FNMB lead\n${firstName} ${lastName} submitted a ${typeLabel} request.\nPhone: ${phone}\nReview: https://1stnmb.com/admin (ID #${applicationId})`;
 
   try {
     const connectors = new ReplitConnectors();
@@ -94,6 +217,11 @@ router.post("/applications", async (req, res) => {
 
   const { type, firstName, lastName, email, phone, data } = parsed.data;
 
+  if (!hasContactConsent(data as Record<string, unknown>)) {
+    res.status(400).json({ error: "Contact consent is required" });
+    return;
+  }
+
   let savedId: number;
   try {
     const [saved] = await db
@@ -107,6 +235,33 @@ router.post("/applications", async (req, res) => {
     return;
   }
 
+  try {
+    const crmLead = await sendToCrm(
+      type,
+      firstName,
+      lastName,
+      email,
+      phone,
+      data as Record<string, unknown>,
+    );
+    if (crmLead) {
+      req.log.info(
+        { applicationId: savedId, crmLeadId: crmLead.leadId, crmStatus: crmLead.status },
+        "Application copied to CRM",
+      );
+    } else {
+      req.log.warn(
+        { applicationId: savedId },
+        "Application saved — CRM integration is not configured",
+      );
+    }
+  } catch (crmErr) {
+    req.log.warn(
+      { applicationId: savedId, err: crmErr },
+      "Application saved but CRM delivery failed",
+    );
+  }
+
   const transporter = createTransporter();
   const notificationEmail = process.env.NOTIFICATION_EMAIL ?? "efrish@c21edva.com";
   const fromAddress = process.env.GMAIL_FROM ?? process.env.SMTP_USER ?? "";
@@ -116,7 +271,7 @@ router.post("/applications", async (req, res) => {
       await transporter.sendMail({
         from: `"FNMB Website" <${fromAddress}>`,
         to: notificationEmail,
-        subject: `🔥 HOT LEAD — ${type === "long-term" ? "Long-Term" : "Bridge Loan"} Application — ${firstName} ${lastName} — CALL NOW`,
+        subject: `New FNMB ${type === "long-term" ? "Long-Term" : "Bridge Loan"} Request — ${firstName} ${lastName}`,
         html: buildEmailHtml(type, firstName, lastName, email, phone, data as Record<string, unknown>),
       });
       req.log.info({ applicationId: savedId }, "Application saved and email sent");
@@ -127,12 +282,39 @@ router.post("/applications", async (req, res) => {
     req.log.warn({ applicationId: savedId }, "Application saved — SMTP not configured, email skipped");
   }
 
-  // Send SMS hot-lead alert via Twilio
+  if (transporter && email) {
+    try {
+      await transporter.sendMail({
+        from: `"First Nationwide Mortgage Bank" <${fromAddress}>`,
+        to: email,
+        subject: "We received your FNMB loan request",
+        html: buildBorrowerConfirmationHtml(firstName),
+      });
+      req.log.info({ applicationId: savedId }, "Borrower confirmation email sent");
+    } catch (emailErr) {
+      req.log.warn(
+        { applicationId: savedId, err: emailErr },
+        "Application saved but borrower confirmation email failed",
+      );
+    }
+  }
+
+  // Send owner SMS notification via Twilio
   try {
     await sendSmsAlert(firstName, lastName, phone, type, savedId);
-    req.log.info({ applicationId: savedId }, "SMS hot-lead alert sent");
+    req.log.info({ applicationId: savedId }, "SMS lead alert sent");
   } catch (smsErr) {
     req.log.warn({ applicationId: savedId, err: smsErr }, "Application saved but SMS alert failed — check Twilio config");
+  }
+
+  try {
+    await sendBorrowerSms(firstName, phone);
+    req.log.info({ applicationId: savedId }, "Borrower confirmation SMS sent");
+  } catch (smsErr) {
+    req.log.warn(
+      { applicationId: savedId, err: smsErr },
+      "Application saved but borrower confirmation SMS failed",
+    );
   }
 
   res.status(201).json({ id: savedId, message: "Application received" });

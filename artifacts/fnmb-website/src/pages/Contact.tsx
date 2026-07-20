@@ -21,6 +21,7 @@ const formSchema = z.object({
 export default function Contact() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [contactConsent, setContactConsent] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,17 +34,57 @@ export default function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!contactConsent) {
+      toast({
+        title: "Consent Required",
+        description: "Please authorize us to contact you about this request.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const nameParts = values.name.trim().split(/\s+/);
+    const firstName = nameParts.shift() ?? "Website";
+    const lastName = nameParts.join(" ") || "Inquiry";
+
+    try {
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: values.inquiryType === "long-term" ? "long-term" : "short-term",
+          firstName,
+          lastName,
+          email: values.email,
+          phone: values.phone,
+          data: {
+            "Submission Type": "Contact Form",
+            "Inquiry Type": values.inquiryType,
+            "Message": values.message,
+            "Contact Consent": "Yes — phone, text, and email about this request",
+          },
+        }),
+      });
+
+      if (!res.ok) throw new Error("Submission failed");
+
       toast({
         title: "Message Sent Successfully",
-        description: "One of our advisors will contact you shortly.",
+        description: "A loan specialist will review your request and respond within 24–48 hours.",
       });
       form.reset();
-    }, 1500);
+      setContactConsent(false);
+    } catch {
+      toast({
+        title: "Message Not Sent",
+        description: "Please try again or call us at (818) 371-1665.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -92,7 +133,7 @@ export default function Contact() {
                     <div>
                       <p className="font-bold text-primary">Email Us</p>
                       <p className="text-muted-foreground">info@1stnmb.com</p>
-                      <p className="text-sm text-muted-foreground mt-1">We aim to reply within 24 hours</p>
+                      <p className="text-sm text-muted-foreground mt-1">We aim to reply within 24–48 hours</p>
                     </div>
                   </div>
 
@@ -222,6 +263,18 @@ export default function Contact() {
                       </FormItem>
                     )}
                   />
+
+                  <label className="flex items-start gap-3 rounded-lg border border-border bg-gray-50 p-4 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={contactConsent}
+                      onChange={(event) => setContactConsent(event.target.checked)}
+                      className="mt-1 h-4 w-4"
+                    />
+                    <span>
+                      By submitting, I agree that First Nationwide Mortgage Bank may contact me about this request by phone, text, or email at the information provided. Consent is not a condition of obtaining services. Message and data rates may apply.
+                    </span>
+                  </label>
 
                   <Button type="submit" size="lg" className="w-full md:w-auto px-8" disabled={isSubmitting}>
                     {isSubmitting ? "Sending..." : "Send Message"}
