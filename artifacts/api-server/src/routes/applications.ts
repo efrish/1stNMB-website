@@ -19,6 +19,67 @@ function escapeHtml(value: unknown): string {
   });
 }
 
+function applicationDetails(data: Record<string, unknown>): string {
+  return Object.entries(data)
+    .map(([key, value]) => `${key}: ${String(value ?? "")}`)
+    .join("\n");
+}
+
+function requestedLoanAmount(data: Record<string, unknown>): number | undefined {
+  const entry = Object.entries(data).find(([key]) => {
+    const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
+    return normalized.includes("loanamount") || normalized.includes("requestedamount");
+  });
+  if (!entry) return undefined;
+
+  const amount = Number(String(entry[1] ?? "").replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(amount) && amount > 0 ? amount : undefined;
+}
+
+async function sendToCrm(
+  type: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone: string,
+  data: Record<string, unknown>,
+): Promise<{ leadId?: number; status?: string } | null> {
+  const baseUrl = process.env.CRM_BASE_URL?.trim().replace(/\/$/, "");
+  const secret = process.env.CRM_WEBHOOK_SECRET?.trim();
+
+  if (!baseUrl || !secret) {
+    return null;
+  }
+
+  const response = await fetch(`${baseUrl}/api/webhook/mortgage-inquiry`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": secret,
+    },
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      email,
+      phone,
+      loanType: type === "long-term" ? "Long-Term Mortgage" : "Short-Term / Bridge Loan",
+      loanAmount: requestedLoanAmount(data),
+      message: applicationDetails(data),
+      source: "1stnmb-website",
+      consent: false,
+      consentVersion: "not-yet-collected",
+    }),
+    signal: AbortSignal.timeout(8_000),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`CRM returned ${response.status}: ${body.slice(0, 300)}`);
+  }
+
+  return response.json() as Promise<{ leadId?: number; status?: string }>;
+}
+
 function createTransporter() {
   const host = process.env.SMTP_HOST;
   const user = process.env.GMAIL_FROM ?? process.env.SMTP_USER;
@@ -122,6 +183,33 @@ router.post("/applications", async (req, res) => {
     req.log.error(err, "Failed to save application to database");
     res.status(500).json({ error: "Failed to submit application" });
     return;
+  }
+
+  try {
+    const crmLead = await sendToCrm(
+      type,
+      firstName,
+      lastName,
+      email,
+      phone,
+      data as Record<string, unknown>,
+    );
+    if (crmLead) {
+      req.log.info(
+        { applicationId: savedId, crmLeadId: crmLead.leadId, crmStatus: crmLead.status },
+        "Application copied to CRM",
+      );
+    } else {
+      req.log.warn(
+        { applicationId: savedId },
+        "Application saved — CRM integration is not configured",
+      );
+    }
+  } catch (crmErr) {
+    req.log.warn(
+      { applicationId: savedId, err: crmErr },
+      "Application saved but CRM delivery failed",
+    );
   }
 
   const transporter = createTransporter();
