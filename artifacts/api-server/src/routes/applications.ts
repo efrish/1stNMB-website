@@ -25,6 +25,10 @@ function applicationDetails(data: Record<string, unknown>): string {
     .join("\n");
 }
 
+function hasContactConsent(data: Record<string, unknown>): boolean {
+  return String(data["Contact Consent"] ?? "").toLowerCase().startsWith("yes");
+}
+
 function requestedLoanAmount(data: Record<string, unknown>): number | undefined {
   const entry = Object.entries(data).find(([key]) => {
     const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
@@ -66,8 +70,8 @@ async function sendToCrm(
       loanAmount: requestedLoanAmount(data),
       message: applicationDetails(data),
       source: "1stnmb-website",
-      consent: false,
-      consentVersion: "not-yet-collected",
+      consent: hasContactConsent(data),
+      consentVersion: "2026-07-20",
     }),
     signal: AbortSignal.timeout(8_000),
   });
@@ -171,6 +175,11 @@ router.post("/applications", async (req, res) => {
   }
 
   const { type, firstName, lastName, email, phone, data } = parsed.data;
+
+  if (!hasContactConsent(data as Record<string, unknown>)) {
+    res.status(400).json({ error: "Contact consent is required" });
+    return;
+  }
 
   let savedId: number;
   try {
